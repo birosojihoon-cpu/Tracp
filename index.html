@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>모험</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#10151c;color:#eef2f5;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;min-height:100vh}#wrap{width:min(100vw,960px);padding:12px}h1{font-size:19px;margin:4px 0 8px}#game{width:100%;aspect-ratio:16/10;display:block;background:#17251e;border:2px solid #46535d;border-radius:12px;touch-action:none}#hud{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:7px 2px;color:#d5e2e8;flex-wrap:wrap}#mana{color:#8edbff;font-weight:800}.overlay{position:fixed;inset:0;background:#080c12f2;display:flex;align-items:center;justify-content:center;padding:18px;z-index:99999}.panel{background:#1b2630;border:1px solid #607382;border-radius:16px;padding:18px;max-width:700px;width:100%;box-shadow:0 10px 50px #0008}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.choice{border:1px solid #536a78;border-radius:12px;background:#253643;color:white;padding:12px;text-align:center;cursor:pointer}.choice .emoji{font-size:36px}.choice small{display:block;color:#b9cbd5;margin-top:5px}.help{font-size:12px;color:#b7c5ce;line-height:1.5;margin-top:10px}.controls{display:flex;gap:8px;justify-content:space-between;margin-top:8px}.pad{display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(3,54px);gap:5px;justify-content:center;margin:10px auto;touch-action:none}.pad button{border:1px solid #5d7380;border-radius:10px;background:#2b3d49;color:#fff;font-size:22px;font-weight:700;touch-action:none;user-select:none}.pad button:active{background:#557787}.pad .blank{visibility:hidden}.controls button{flex:1;padding:12px;border:0;border-radius:10px;background:#304552;color:white;font-weight:700}.controls button:active{background:#517080}
+*{box-sizing:border-box}body{margin:0;background:#10151c;color:#eef2f5;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;min-height:100vh}#wrap{width:min(100vw,960px);padding:12px}h1{font-size:19px;margin:4px 0 8px}#game{width:100%;aspect-ratio:16/10;display:block;background:#17251e;border:2px solid #46535d;border-radius:12px;touch-action:none}#hud{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:7px 2px;color:#d5e2e8;flex-wrap:wrap}#mana{color:#8edbff;font-weight:800}.overlay{position:fixed;inset:0;background:#080c12f2;display:flex;align-items:center;justify-content:center;padding:18px;z-index:99999}.panel{background:#1b2630;border:1px solid #607382;border-radius:16px;padding:18px;max-width:700px;width:100%;box-shadow:0 10px 50px #0008}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.choice{border:1px solid #536a78;border-radius:12px;background:#253643;color:white;padding:12px;text-align:center;cursor:pointer}.choice .emoji{font-size:36px}.choice small{display:block;color:#b9cbd5;margin-top:5px}.help{font-size:12px;color:#b7c5ce;line-height:1.5;margin-top:10px}/* controls moved to mobileBar */.pad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,52px);gap:4px;touch-action:none}.pad button{border:1px solid #5d7380;border-radius:12px;background:#2b3d49;color:#fff;font-size:22px;font-weight:700;touch-action:none;user-select:none;-webkit-user-select:none}.pad button:active{background:#557787}.pad .blank{visibility:hidden}/* old *//* old */
 .choice img.preview{width:56px;height:56px;object-fit:contain;image-rendering:pixelated;display:block;margin:0 auto 6px;background:#1a2430;border-radius:8px}
 .choices{grid-template-columns:repeat(3,1fr)}
 @media(max-width:500px){.choices{grid-template-columns:repeat(2,1fr)}}
@@ -61,10 +61,19 @@
 #roundBanner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #roundBanner.boss{color:#ffd0d0;text-shadow:0 0 20px #c44,0 4px 0 #300,0 8px 24px #000;border-color:#e88}
 
+
+.mobileBar{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:8px;padding:0 2px 4px;touch-action:none;user-select:none}
+.actionRight{display:flex;flex-direction:column;align-items:center;gap:8px}
+.actionRight #atk{width:96px;height:96px;border-radius:50%;border:3px solid #e8c96a;background:radial-gradient(circle at 35% 30%,#6a8a9e,#304552 70%);color:#fff;font-size:15px;font-weight:800;line-height:1.15;box-shadow:0 6px 0 #1a2a33,0 8px 18px #0006;touch-action:none;-webkit-user-select:none;user-select:none}
+.actionRight #atk:active{transform:translateY(3px);box-shadow:0 3px 0 #1a2a33}
+.actionRight .smallRow{display:flex;gap:8px}
+.actionRight #skill,.actionRight #bag{width:54px;height:54px;border-radius:50%;border:2px solid #5d7380;background:#304552;color:#fff;font-size:18px;font-weight:700;touch-action:none}
+.actionRight #skill:active,.actionRight #bag:active{background:#517080}
+
 </style></head><body>
 <div id="roundBanner"></div>
 
-<div id="wrap"><h1>⚔ 모험</h1><canvas id="game" width="960" height="600"></canvas><div id="hud"><span id="status">캐릭터를 선택하세요</span><span id="mana">MP: --</span><span id="atkdef">ATK -- · DEF --</span><span>이동: WASD / 방향키 · 공격: Space · 스킬: E</span></div><div class="pad" aria-label="이동 방향키"><button class="blank"> </button><button data-dir="up">▲</button><button class="blank"> </button><button data-dir="left">◀</button><button class="blank"> </button><button data-dir="right">▶</button><button class="blank"> </button><button data-dir="down">▼</button><button class="blank"> </button></div><div class="controls"><button id="atk">⚔ 공격</button><button id="skill">✨ 스킬</button><button id="bag">🎒 가방</button></div></div>
+<div id="wrap"><h1>⚔ 모험</h1><canvas id="game" width="960" height="600"></canvas><div id="hud"><span id="status">캐릭터를 선택하세요</span><span id="mana">MP: --</span><span id="atkdef">ATK -- · DEF --</span><span>이동: WASD / 방향키 · 공격: Space · 스킬: E</span></div><div class="mobileBar"><div class="pad" aria-label="이동"><button class="blank"> </button><button data-dir="up">▲</button><button class="blank"> </button><button data-dir="left">◀</button><button class="blank"> </button><button data-dir="right">▶</button><button class="blank"> </button><button data-dir="down">▼</button><button class="blank"> </button></div><div class="actionRight"><button id="atk" type="button">⚔<br>공격</button><div class="smallRow"><button id="skill" type="button">✨</button><button id="bag" type="button">🎒</button></div></div></div></div>
 
 
 <div class="overlay hidden" id="invOverlay">
@@ -586,7 +595,19 @@ function skill(){
     }
   }
 }
-doc.getElementById('atk').onclick=attack;doc.getElementById('skill').onclick=skill;
+(function(){
+  const atkBtn=doc.getElementById('atk');
+  const skBtn=doc.getElementById('skill');
+  function bindHold(btn, fn){
+    if(!btn) return;
+    const fire=(e)=>{ e.preventDefault(); fn(); };
+    btn.addEventListener('pointerdown', fire, {passive:false});
+    btn.addEventListener('click', fire, {passive:false});
+    btn.addEventListener('contextmenu', e=>e.preventDefault());
+  }
+  bindHold(atkBtn, attack);
+  bindHold(skBtn, skill);
+})();
 // ===== 인벤토리 / 제작 =====
 
 const RECIPES = [
