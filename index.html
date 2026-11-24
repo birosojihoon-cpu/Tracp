@@ -465,8 +465,27 @@ function applyIncomingDamage(raw){
 function attack(){
   if(!player||player.attackCd>0)return;
   player.attackCd=.32;
+  // 브롤스타즈식 오토에임: 가장 가까운 적/보스 자동 조준
   let aimX = player.dir||1, aimY = player.dirY||0;
-  if(Math.abs(aimX)<0.01 && Math.abs(aimY)<0.01) aimX = player.dir||1;
+  let best=null, bestD=1e9;
+  const maxAim = (player.range||150) + 140;
+  enemies.forEach(m=>{
+    const d=Math.hypot(m.x-player.x, m.y-player.y);
+    if(d<bestD && d<maxAim){ bestD=d; best=m; }
+  });
+  if(boss){
+    const d=Math.hypot(boss.x-player.x, boss.y-player.y);
+    if(d<bestD && d<maxAim+40){ bestD=d; best=boss; }
+  }
+  if(best){
+    aimX = best.x - player.x;
+    aimY = best.y - player.y;
+    // 바라보는 방향도 갱신
+    if(Math.abs(aimX)>0.5) player.dir = aimX>0?1:-1;
+    player.dirY = aimY;
+  } else {
+    if(Math.abs(aimX)<0.01 && Math.abs(aimY)<0.01) aimX = player.dir||1;
+  }
   let len = Math.hypot(aimX, aimY)||1;
   aimX/=len; aimY/=len;
   const ang = Math.atan2(aimY, aimX);
