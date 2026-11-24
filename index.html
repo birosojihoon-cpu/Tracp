@@ -498,7 +498,7 @@ function attack(){
   if(t==='druid'){
     // 지팡이 끝에서 덩굴
     const ox = player.x + aimX*22, oy = player.y - 34 + aimY*14;
-    shots.push({x:ox, y:oy, vx:aimX*5.5, vy:aimY*5.5, d:player.damage, life:0.85, fromPlayer:true, kind:'vine', grow:0, maxLen:90, baseX:ox, baseY:oy, ang:ang});
+    shots.push({x:ox, y:oy, vx:aimX*5.5, vy:aimY*5.5, d:player.damage, life:1.2, fromPlayer:true, kind:'vine', grow:0, maxLen:120, baseX:ox, baseY:oy, ang:ang, strongHome:true});
     fx.push({x:ox, y:oy, r:14, t:.12});
     return;
   }
@@ -1244,7 +1244,8 @@ if(boss&&isHost){
 shots.forEach(s=>{
   // 플레이어 탄환 약유도
   if(s.fromPlayer && !s.fromBoss){
-    let tx=null, ty=null, best=120;
+    const strong = !!(s.strongHome || s.kind==='vine');
+    let tx=null, ty=null, best=strong?420:120;
     enemies.forEach(m=>{
       const d=Math.hypot(m.x-s.x, m.y-s.y);
       if(d<best){best=d; tx=m.x; ty=m.y;}
@@ -1253,17 +1254,23 @@ shots.forEach(s=>{
       const d=Math.hypot(boss.x-s.x, boss.y-s.y);
       if(d<best){best=d; tx=boss.x; ty=boss.y;}
     }
-    if(tx!=null && best<130){
+    const rangeOk = strong ? (tx!=null && best<450) : (tx!=null && best<130);
+    if(rangeOk){
       const desired=Math.atan2(ty-s.y, tx-s.x);
       const cur=Math.atan2(s.vy, s.vx);
       let diff=desired-cur;
       while(diff>Math.PI) diff-=Math.PI*2;
       while(diff<-Math.PI) diff+=Math.PI*2;
-      const turn=Math.max(-0.012, Math.min(0.012, diff)); // 아주 약한 유도
-      const spd=Math.hypot(s.vx,s.vy)||7;
+      // 드루이드 덩굴: 강한 유도 / 다른 원거리: 아주 약함
+      const maxTurn = strong ? 0.22 : 0.012;
+      const turn=Math.max(-maxTurn, Math.min(maxTurn, diff));
+      const baseSpd = Math.hypot(s.vx,s.vy)||7;
+      // 가까울수록 약간 가속
+      const spd = strong ? Math.min(9.5, baseSpd + (best<80?0.8:0.25)) : baseSpd;
       const na=cur+turn;
       s.vx=Math.cos(na)*spd;
       s.vy=Math.sin(na)*spd;
+      if(s.kind==='vine') s.ang = na;
     }
   }
   if(s.kind==='vine' && s.maxLen){
